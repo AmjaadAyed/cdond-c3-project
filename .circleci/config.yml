@@ -33,47 +33,29 @@ commands:
             fi
             
 jobs:
-  build-frontend:
+  build_backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-build]
-      - run:
-          name: Build front-end
-          command: |
-            sudo apt -y install jq tar gzip git curl
-      - run:
-          name: Frontend Build
-          command: |
-            cd frontend
-            npm i
-            npm run build            
-      - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-build
+      - run: npm i --prefix backend
+      - run: npm run lint --prefix backend
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/backend/node_modules
 
-  build-backend:
+  build_frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run:
-          name: Install prerequsites
-          command: |
-            sudo apt -y install jq tar gzip git curl
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Back-end build
-          command: |
-            cd backend
-            npm run build
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-build
-
+      - run: npm i --prefix frontend
+      - run: npm run lint --prefix frontend
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/frontend/node_modules
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -85,7 +67,6 @@ jobs:
           command: |
             sudo apt -y install jq tar gzip git curl
 
-
       - run:
           name: Run frontend tests
           command: |
@@ -93,13 +74,23 @@ jobs:
             npm i
             npm run test
                 
+
   test-backend:
     docker:
-      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      - checkout
+
+      - run:
+          name: Install prerequsites
+          command: |
+            sudo apt -y install jq tar gzip git curl
+
+      - run:
+          name: Run backend tests
+          command: |
+            cd backend
+            npm run test
             
   scan-frontend:
     docker:

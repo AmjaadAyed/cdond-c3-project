@@ -69,7 +69,6 @@ jobs:
           name: Back-end build
           command: |
             cd backend
-            npm i
             npm run build
       - save_cache:
           paths: [backend/node_modules]
@@ -77,11 +76,22 @@ jobs:
 
   test-frontend:
     docker:
-      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      - checkout
+
+      - run:
+          name: Install prerequsites
+          command: |
+            sudo apt -y install jq tar gzip git curl
+
+
+      - run:
+          name: Run frontend tests
+          command: |
+            cd frontend
+            npm i
+            npm run test
                 
   test-backend:
     docker:

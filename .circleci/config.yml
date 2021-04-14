@@ -43,8 +43,13 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            # Your code here
-            exit 1
+            sudo apt -y install jq tar gzip git curl
+      - run:
+          name: Frontend Build
+          command: |
+            cd frontend
+            npm i
+            npm run build            
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -54,13 +59,18 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - run:
+          name: Install prerequsites
+          command: |
+            sudo apt -y install jq tar gzip git curl
       - restore_cache:
           keys: [backend-build]
       - run:
           name: Back-end build
           command: |
-             # Your code here
-             exit 1
+            cd backend
+            npm i
+            npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build

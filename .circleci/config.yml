@@ -38,65 +38,49 @@ commands:
             
 jobs:
 
-    build-backend:
+  build-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+
+      - run:
+          name: Install prerequsites
+          command: |            
+            sudo apt -y install jq tar gzip git curl
+      - run:
+          name: Frontend Build
+          command: |
+            cd frontend
+            npm i
+            npm run build
+      - save_cache:
+          key: v1-frontend-build
+          paths:
+            - ~/project/frontend/node_modules
+
+
+  build-backend:
     docker:
       - image: circleci/node:13.8.0
 
-    #environment:
-      #GIT_COMMIT_DESC: git log --format=%B -n 1 $CIRCLE_SHA1
-
     steps:
       - checkout
+
+      - run:
+          name: Install prerequsites
+          command: |
+            sudo apt -y install jq tar gzip git curl
       - run:
           name: Backend build
           command: |
             cd backend
             npm i
             npm run build
-            echo "export COMMIT_MESSAGE=\"$(git log --format=%B -n 1 $CIRCLE_SHA1)\"" >> $BASH_ENV
-            source $BASH_ENV
-      - slack/notify:
-          channel: C01FC0ZPENR
-          event: fail
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                      "type": "mrkdwn",
-                      "text": "Your job *$CIRCLE_JOB* has *faild* :octagonal_sign: (<$CIRCLE_BUILD_URL|build #$CIRCLE_BUILD_NUM>)\n\nrepo: $CIRCLE_REPOSITORY_URL\n\nbranch: $CIRCLE_BRANCH\n\ncommitter: $CIRCLE_USERNAME\n\ncommit message: $COMMIT_MESSAGE"
-                  }
-                }
-              ]
-            }
-      - slack/notify:
-          channel: C01FC0ZPENR
-          event: pass
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                      "type": "mrkdwn",
-                      "text": "Your job *$CIRCLE_JOB* has *built* :white_check_mark: (<$CIRCLE_BUILD_URL|build #$CIRCLE_BUILD_NUM>)\n\nrepo: $CIRCLE_REPOSITORY_URL\n\nbranch: $CIRCLE_BRANCH\n\ncommitter: $CIRCLE_USERNAME\n\ncommit message: $COMMIT_MESSAGE"
-                  }
-                }
-              ]
-            }
-              
-  build_frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - run: npm i --prefix frontend
-      - run: npm run lint --prefix frontend
-      - persist_to_workspace:
-          root: ~/
+      - save_cache:
+          key: v1-backend-build
           paths:
-            - project/frontend/node_modules
+            - ~/project/backend/node_modules
 
   test_backend:
     docker:

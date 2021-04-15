@@ -1,5 +1,9 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.1.1
+
+  
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -33,18 +37,55 @@ commands:
             fi
             
 jobs:
-  build_backend:
+
+    build-backend:
     docker:
       - image: circleci/node:13.8.0
+
+    #environment:
+      #GIT_COMMIT_DESC: git log --format=%B -n 1 $CIRCLE_SHA1
+
     steps:
       - checkout
-      - run: npm i --prefix backend
-      - run: npm run lint --prefix backend
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend/node_modules
-
+      - run:
+          name: Backend build
+          command: |
+            cd backend
+            npm i
+            npm run build
+            echo "export COMMIT_MESSAGE=\"$(git log --format=%B -n 1 $CIRCLE_SHA1)\"" >> $BASH_ENV
+            source $BASH_ENV
+      - slack/notify:
+          channel: C01FC0ZPENR
+          event: fail
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                      "type": "mrkdwn",
+                      "text": "Your job *$CIRCLE_JOB* has *faild* :octagonal_sign: (<$CIRCLE_BUILD_URL|build #$CIRCLE_BUILD_NUM>)\n\nrepo: $CIRCLE_REPOSITORY_URL\n\nbranch: $CIRCLE_BRANCH\n\ncommitter: $CIRCLE_USERNAME\n\ncommit message: $COMMIT_MESSAGE"
+                  }
+                }
+              ]
+            }
+      - slack/notify:
+          channel: C01FC0ZPENR
+          event: pass
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                      "type": "mrkdwn",
+                      "text": "Your job *$CIRCLE_JOB* has *built* :white_check_mark: (<$CIRCLE_BUILD_URL|build #$CIRCLE_BUILD_NUM>)\n\nrepo: $CIRCLE_REPOSITORY_URL\n\nbranch: $CIRCLE_BRANCH\n\ncommitter: $CIRCLE_USERNAME\n\ncommit message: $COMMIT_MESSAGE"
+                  }
+                }
+              ]
+            }
+              
   build_frontend:
     docker:
       - image: circleci/node:13.8.0

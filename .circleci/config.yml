@@ -52,66 +52,25 @@ jobs:
       - run: npm i --prefix frontend
       - run: npm run  --prefix frontend
 
-  # test-frontend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run: npm i --prefix frontend
-  #     - run: npm run test --prefix frontend
-
-  # test-backend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run: npm i --prefix backend
-  #     - run: npm run test --prefix backend
-
-
-  test-frontend:
+  test_backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
+      - run: npm i --prefix backend
+      - run: npm run test --prefix backend
 
-      - run:
-          name: Install prerequsites
-          command: |
-            sudo apt -y install jq tar gzip git curl
-      - restore_cache:
-          key: v1-frontend-build
-
-      - run:
-          name: Run frontend tests
-          command: |
-            cd frontend
-            npm i
-            npm run test
-
-
-  test-backend:
+  test_frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-
-      - run:
-          name: Install prerequsites
-          command: |
-            sudo apt -y install jq tar gzip git curl
-      - restore_cache:
-          key: v1-backend-build
-
-      - run:
-          name: Run backend tests
-          command: |
-            cd backend
-            npm run test
+      - attach_workspace:
+          at: ~/
+      - run: npm i --prefix frontend
+      - run: npm run test --prefix frontend
 
   scan-backend:
     docker:

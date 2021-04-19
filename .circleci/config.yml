@@ -34,7 +34,7 @@ commands:
             
 jobs:
 
-  build_backend:
+  build-backend:
    
     docker:
       - image: circleci/node:13.8.0
@@ -43,7 +43,7 @@ jobs:
       - run: npm i --prefix backend
       - run: npm run --prefix backend
 
-  build_frontend:
+  build-frontend:
     
     docker:
       - image: circleci/node:13.8.0
@@ -52,7 +52,7 @@ jobs:
       - run: npm i --prefix frontend
       - run: npm run  --prefix frontend
 
-  test_backend:
+  test-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -60,7 +60,7 @@ jobs:
       - run: npm i --prefix backend
       - run: npm run test --prefix backend
 
-  test_frontend:
+  test-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -68,33 +68,19 @@ jobs:
       - run: npm i --prefix frontend
       - run: npm run test --prefix frontend
 
-  scan_backend:
+  scan-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - run: npm audit fix --audit-level=critical --force
-  scan_frontend:
+  scan-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - run: npm audit fix --audit-level=critical  --force
 
-
-  # scan-frontend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - run: npm audit --audit-level=critical --force
-
-  # scan-backend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - run: npm audit --audit-level=critical
 
   # deploy-infrastructure:
   #   docker:
@@ -265,14 +251,14 @@ jobs:
 workflows:
   default:
     jobs:
-      - build_backend
-      - build_frontend
-      - test_backend:
+      - build-backend
+      - build-frontend
+      - test-backend:
           requires:
-            - build_backend
-      - test_frontend:
+            - build-backend
+      - test-frontend:
           requires:
-            - build_frontend
+            - build-frontend
       - scan-backend:
           requires: [build-backend]
       - scan-frontend:

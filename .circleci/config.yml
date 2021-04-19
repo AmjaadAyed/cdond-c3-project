@@ -49,24 +49,25 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm install
-      - run: npm build
+      - run: npm i --prefix frontend
+      - run: npm run  --prefix frontend
 
   test-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm install
-      - run: npm rbuild
+            cd backend
+            npm run test
 
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm i --prefix frontend
-      - run: npm run test --prefix frontend
+            cd frontend
+            npm i
+            npm run test
 
   scan-backend:
     docker:

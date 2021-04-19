@@ -38,55 +38,60 @@ commands:
             
 jobs:
 
-  build-backend:
+jobs:
+
+  build_backend:
+    working_directory: ~/project/backend
     docker:
-      - image: circleci/node:13.8.0
-
-    #environment:
-      #GIT_COMMIT_DESC: git log --format=%B -n 1 $CIRCLE_SHA1
-
+      - image: circleci/node:14.11.0
     steps:
       - checkout
-      - run:
-          name: Backend build
-          command: |
-            cd backend
-            npm i
-            npm run build
-         
-              
+      - run: npm run lint
+
   build_frontend:
+    working_directory: ~/project/frontend
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.11.0
     steps:
       - checkout
-      - run: npm i --prefix frontend
-      - run: npm run lint --prefix frontend
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/frontend/node_modules
+      - run: npm i
+      - run: npm run lint
 
-  test_backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run: npm i --prefix backend
-      - run: npm run test --prefix --force
+  # test_backend:
+  #   working_directory: ~/project/backend
+  #   docker:
+  #     - image: circleci/node:14.11.0
+  #   steps:
+  #     - checkout
+  #     - run: npm i
+  #     - run: npm run test
 
-  test_frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run: npm i --prefix frontend
-      - run: npm run test --prefix frontend
-            
+  # test_frontend:
+  #   working_directory: ~/project/frontend
+  #   docker:
+  #     - image: circleci/node:14.11.0
+  #   steps:
+  #     - checkout
+  #     - run: npm i
+  #     - run: npm run test
+
+  # analyze_backend:
+  #   working_directory: ~/project/backend
+  #   docker:
+  #     - image: circleci/node:14.11.0
+  #   steps:
+  #     - checkout
+  #     - run: npm audit
+
+  # analyze_frontend:
+  #   working_directory: ~/project/frontend
+  #   docker:
+  #     - image: circleci/node:14.11.0
+  #   steps:
+  #     - checkout
+  #     - run: npm audit
+
+
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -272,30 +277,30 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [test-feature-branch]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [test-feature-branch]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-backend, deploy-frontend]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
+      # - cleanup:
+      #     requires: [cloudfront-update]

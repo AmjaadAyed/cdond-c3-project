@@ -55,9 +55,10 @@ jobs:
       - restore_cache:
           keys: [frontend-build]      
       - run: npm i --prefix frontend
-      - run: npm run  --prefix frontend
+    
 
   test-backend:
+
     docker:
       - image: circleci/node:14.11.0
     steps:
@@ -65,7 +66,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: npm i --prefix backend
-      - run: npm run test --prefix backend
+
 
   test-frontend:
     docker:

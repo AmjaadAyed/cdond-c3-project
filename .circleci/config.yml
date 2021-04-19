@@ -37,7 +37,7 @@ jobs:
   build-backend:
    
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.11.0
     steps:
       - checkout
       - run: npm i --prefix backend
@@ -46,7 +46,7 @@ jobs:
   build-frontend:
     
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.11.0
     steps:
       - checkout
       - run: npm i --prefix frontend
@@ -54,7 +54,7 @@ jobs:
 
   test-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.11.0
     steps:
       - checkout
       - attach_workspace:
@@ -64,7 +64,7 @@ jobs:
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.11.0
     steps:
       - checkout
       - attach_workspace:
@@ -74,13 +74,13 @@ jobs:
 
   scan-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.11.0
     steps:
       - checkout
       - run: npm audit fix --audit-level=critical --force
   scan-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.11.0
     steps:
       - checkout
       - run: npm audit fix --audit-level=critical  --force

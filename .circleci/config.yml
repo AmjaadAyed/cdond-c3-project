@@ -41,7 +41,7 @@ jobs:
     steps:
       - checkout
       - run: npm i --prefix backend
-      - run: npm run  --prefix backend
+      - run: npm run --prefix backend
 
   build_frontend:
     
@@ -77,14 +77,14 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm audit --audit-level=critical -
+      - run: npm audit --audit-level=critical 
   analyze_frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - run: npm audit --audit-level=critical 
-
+S
 
   # scan-frontend:
   #   docker:

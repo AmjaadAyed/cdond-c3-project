@@ -77,13 +77,13 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm audit --audit-level=critical --force
+      - run: npm audit fix --audit-level=critical --force
   analyze_frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm audit --audit-level=critical  --force
+      - run: npm audit fix --audit-level=critical  --force
 
 
   # scan-frontend:

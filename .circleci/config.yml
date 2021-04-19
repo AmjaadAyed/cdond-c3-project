@@ -92,7 +92,7 @@ jobs:
             cd frontend
             npm i
             npm run test
-      - slack-notification-fail
+
 
   test-backend:
     docker:

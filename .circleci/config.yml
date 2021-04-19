@@ -267,7 +267,8 @@ jobs:
 #             fi
             
 
-  workflow:
+workflows:
+  default:
     jobs:
       - build_backend
       - build_frontend

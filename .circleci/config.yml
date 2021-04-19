@@ -68,13 +68,13 @@ jobs:
       - run: npm i --prefix frontend
       - run: npm run test --prefix frontend
 
-  scan-backend:
+  scan_backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - run: npm audit fix --audit-level=critical --force
-  scan-backend:
+  scan_backend:
     docker:
       - image: circleci/node:13.8.0
     steps:

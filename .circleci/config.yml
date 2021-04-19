@@ -59,8 +59,8 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: npm i --prefix backend
-      - run: npm run test --prefix backend
+      - run: npm i 
+      - run: npm run test 
 
   test_frontend:
     docker:
@@ -69,8 +69,8 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: npm i --prefix frontend
-      - run: npm run test --prefix frontend
+      - run: npm i 
+      - run: npm run test 
 
   analyze_backend:
     docker:

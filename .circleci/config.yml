@@ -53,38 +53,38 @@ jobs:
       - run: npm run lint --prefix frontend
 
   test_backend:
-    working_directory: ~/project/backend
     docker:
-      - image: circleci/node:14.11.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm i
-      - run: npm run test
+      - attach_workspace:
+          at: ~/
+      - run: npm i --prefix backend
+      - run: npm run test --prefix backend
 
   test_frontend:
-     
     docker:
-      - image: circleci/node:14.11.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm i
-      - run: npm run test
+      - attach_workspace:
+          at: ~/
+      - run: npm i --prefix frontend
+      - run: npm run test --prefix frontend
 
   analyze_backend:
-     
     docker:
-      - image: circleci/node:14.11.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm audit --prefix backend
+      - run: npm audit --audit-level=critical --prefix backend
 
   analyze_frontend:
-     
     docker:
-      - image: circleci/node:14.11.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm audit --prefix frontend
+      - run: npm audit --audit-level=critical --prefix frontend
 
 
   # scan-frontend:

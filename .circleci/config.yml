@@ -57,17 +57,16 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-            cd backend
-            npm run test
+      - run: npm i --prefix backend
+      - run: npm run test --prefix backend
 
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-            cd frontend
-            npm i
-            npm run test
+        - run: npm i --prefix frontend
+        - run: npm run test --prefix frontend
 
   scan-backend:
     docker:

@@ -81,22 +81,32 @@ jobs:
             
 
 
+    scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Scan frontend depedencies
+          command: |
+            cd frontend
+            npm audit --audit-level=critical
+
+            
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: npm install
-      - run: npm audit fix --audit-level=critical  --force
-
-  scan-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - run: npm audit fix --audit-level=critical  --force
-
-
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Scan backend depedencies
+          command: |
+            cd backend
+            npm audit --audit-level=critical
   # deploy-infrastructure:
   #   docker:
   #     # Docker image here that supports AWS CLI

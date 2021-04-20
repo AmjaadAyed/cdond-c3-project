@@ -75,6 +75,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
+      - run: npm install oauth-sign
       - run: npm i 
       - run: cd ~/project/frontend
       - run: npm run test

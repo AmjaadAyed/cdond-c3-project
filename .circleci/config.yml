@@ -75,9 +75,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: npm i --prefix frontend
-      - run: npm run test --prefix frontend
-
+      - run: npm i 
+      - run: cd ~/project/frontend
+      - run: npm test
 
   scan-backend:
     docker:

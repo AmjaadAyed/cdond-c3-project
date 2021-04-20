@@ -77,7 +77,6 @@ jobs:
       - attach_workspace:
           at: ~/
 <<<<<<< HEAD
-      - run: npm i --prefix backend
 =======
       - run: npm i --prefix frontend
 >>>>>>> 41a29283b3b565234fa388720235865fa740db67

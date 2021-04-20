@@ -77,7 +77,7 @@ jobs:
           at: ~/
       - run: npm i 
       - run: cd ~/project/frontend
-      - run: npm test
+      - run: npm run test
 
   scan-backend:
     docker:

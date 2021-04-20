@@ -11,8 +11,7 @@ export class EmployeeCreator extends BaseCommandHandler<CreateEmployee, Employee
   constructor(private readonly employeeRepository: EmployeeRepository) {
     super();
   }
-  async handle(command: CreateEmployee): Promise<Employee> {
-    
+  async handle(command: CreateEmployee): Promise<Employee> {  
     const employee = new Employee(command);
     return await this.employeeRepository.save(employee);
   }

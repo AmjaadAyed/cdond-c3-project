@@ -37,7 +37,7 @@ export class Employee extends AggregateRoot<number> {
   }
 
   @PrimaryGeneratedColumn()
-  //change <string> to <number> in line 8 to fix the compile error
+  // change <string> to <number> in line 8 to fix the compile error
   id: number;
 
   @Column({ length: 100 })

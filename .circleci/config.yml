@@ -76,7 +76,11 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
+<<<<<<< HEAD
       - run: npm i --prefix backend
+=======
+      - run: npm i --prefix frontend
+>>>>>>> 41a29283b3b565234fa388720235865fa740db67
       - run: npm run test --prefix frontend
             
   scan-backend:
@@ -84,14 +88,22 @@ jobs:
       - image: circleci/node:14.11.0
     steps:
       - checkout
+<<<<<<< HEAD
       - run: npm audit --audit-level=critical
+=======
+      - run: npm audit fix --audit-level=critical --force
+>>>>>>> 41a29283b3b565234fa388720235865fa740db67
 
   scan-frontend:
     docker:
       - image: circleci/node:14.11.0
     steps:
       - checkout
+<<<<<<< HEAD
       - run: npm audit --audit-level=critical
+=======
+      - run: npm audit fix --audit-level=critical --force
+>>>>>>> 41a29283b3b565234fa388720235865fa740db67
 
 
   # deploy-infrastructure:

@@ -81,7 +81,7 @@ jobs:
             
 
 
-    scan-frontend:
+  scan-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -94,7 +94,7 @@ jobs:
             cd frontend
             npm audit --audit-level=critical
 
-            
+
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -107,6 +107,8 @@ jobs:
           command: |
             cd backend
             npm audit --audit-level=critical
+
+
   # deploy-infrastructure:
   #   docker:
   #     # Docker image here that supports AWS CLI

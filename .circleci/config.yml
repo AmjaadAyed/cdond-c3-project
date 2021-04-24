@@ -128,10 +128,9 @@ jobs:
     steps:
       - checkout  
       - run:
-          name: Install dependencies
+          name: Install prerequsites
           command: |
-            apk add --update curl nodejs npm ansible zip
-            pip install awscli    
+            yum -y install tar gzip jq git   
       - run:
           name: Ensure back-end infrastructure exists
           command: |

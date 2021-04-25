@@ -1,4 +1,4 @@
 - name: "BEUP400.01 run backend service"
-  become_user: udapeople
+  become_user: ubuntu
   shell: |
     npm run start

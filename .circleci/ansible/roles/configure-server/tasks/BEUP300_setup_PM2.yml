@@ -1,4 +1,4 @@
-- name: "BEUP300.01 create safe user 'udapeople'"
+- name: "BEUP300.01 create safe user 'ubuntu'"
   become: true
   user:
     name: udapeople

@@ -1,0 +1,5 @@
+- name: BEUP100 udapeople prerequisites
+  include_tasks: BEUP100_prerequsites.yml
+
+- name: BEUP400 run application
+  include_tasks: BEUP400_run_app.yml

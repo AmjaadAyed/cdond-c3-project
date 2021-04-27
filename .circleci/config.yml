@@ -214,28 +214,32 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
+
+      - restore_cache:
+          keys: [backend-build]
       - run:
-          name: Run DB migrations
+          name: Install dependencies
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_12.x | bash -
+            yum -y install nodejs npm tar gzip jq git
+      - run:
+          name: Run migrations
           command: |
             cd backend
-            npm run migrations >> migration_output.txt
-            cat migration_output.txt
+            npm i
+            npm run migrations > /tmp/migration.log
       - run:
-          name: Store migration result in a file.
+          name: Send migration results to memstash
           command: |
-            cd backend
-            if grep -q "has been executed successfully." migration_output.txt
+            MIGRATION_COUNT=`grep -c "has been executed successfully" /tmp/migration.log || true`
+            echo "migrations count: ${MIGRATION_COUNT}"
+            if [[ $MIGRATION_COUNT -gt 0 ]];
             then
-              touch ~/project/.circleci/outputs/db_migration_success
-            fi
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/outputs/
-      - destroy_environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+              # put it in the shared memory
+              curl -H "Content-Type: text/plain" \
+               -H "token: e38aee29-a976-4696-843d-2d115c52219a" \
+               --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            fi 
 
 
 

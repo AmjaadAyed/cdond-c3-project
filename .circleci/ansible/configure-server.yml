@@ -1,23 +1,24 @@
-- name: Configuring newly created EC2 instances
-  hosts: all
+---
+
+- name: "configuration play." 
+  hosts: web
   user: ubuntu
-  roles:
-    - role: weareinteractive.environment
-      become: true
-    - role: setup
-      become: true
-    - role: deploy_backend
-      become: true
-    - role: configure_node_exporter
-      become: true
+  gather_facts: false
   vars:
-    environment_config:
-      NODE_ENV: production
-      ENVIRONMENT: production
-      TYPEORM_CONNECTION: postgres
-      TYPEORM_ENTITIES: /root/backend_app/modules/domain/**/*.entity.js
-      TYPEORM_HOST: "{{ lookup('env','TYPEORM_HOST') }}"
-      TYPEORM_PORT: "{{ lookup('env','TYPEORM_PORT') }}"
-      TYPEORM_USERNAME: "{{ lookup('env','TYPEORM_USERNAME') }}"
-      TYPEORM_PASSWORD: "{{ lookup('env','TYPEORM_PASSWORD') }}"
-      TYPEORM_DATABASE: "{{ lookup('env','TYPEORM_DATABASE') }}"
+    - ansible_python_interpreter: /usr/bin/python3
+    - ansible_host_key_checking: false
+    - ansible_stdout_callback: yaml
+
+  # "set postgres environment variables"
+  environment:
+    ENVIRONMENT: production
+    TYPEORM_CONNECTION: postgres
+    TYPEORM_ENTITIES: ./src/modules/domain/**/*.entity.ts
+    TYPEORM_HOST: ec2-18-207-232-119.compute-1.amazonaws.com
+    TYPEORM_PORT: 5432
+    TYPEORM_USERNAME: postgres
+    TYPEORM_PASSWORD: Amjad000
+    TYPEORM_DATABASE: udapeople-db
+
+  roles:
+    - configure-server

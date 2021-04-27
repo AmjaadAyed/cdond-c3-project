@@ -1,14 +1,14 @@
 - name: "BEUP300.01 create safe user 'ubuntu'"
   become: true
   user:
-    name: udapeople
+    name: ubuntu
     password: {{ upassword | password_hash('sha512') }}
     groups:
       - root
     state: present
     shell: /bin/bash
     createhome: yes
-    home: /home/udapeople
+    home: /home/ubuntu
 
 - name: "BEUP300.02 give permission to port 80"
   become: true

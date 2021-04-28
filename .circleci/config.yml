@@ -217,29 +217,28 @@ jobs:
 
       - restore_cache:
           keys: [backend-build]
+      - attach_workspace:
+          at: ~/
       - run:
-          name: Install dependencies
-          command: |
-            curl -sL https://rpm.nodesource.com/setup_12.x | bash -
-            yum -y install nodejs npm tar gzip jq git
-      - run:
-          name: Run migrations
+          name: Run DB migrations
           command: |
             cd backend
-            npm i
-            npm run migrations > /tmp/migration.log
+            npm run migrations >> migration_output.txt
+            cat migration_output.txt
       - run:
-          name: Send migration results to memstash
+          name: Store migration result in a file.
           command: |
-            MIGRATION_COUNT=`grep -c "has been executed successfully" /tmp/migration.log || true`
-            echo "migrations count: ${MIGRATION_COUNT}"
-            if [[ $MIGRATION_COUNT -gt 0 ]];
+            cd backend
+            if grep -q "has been executed successfully." migration_output.txt
             then
-              # put it in the shared memory
-              curl -H "Content-Type: text/plain" \
-               -H "token: e38aee29-a976-4696-843d-2d115c52219a" \
-               --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
-            fi 
+              touch ~/project/.circleci/outputs/db_migration_success
+            fi
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/outputs/
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
 
 

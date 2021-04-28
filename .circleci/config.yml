@@ -220,6 +220,10 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Install prerequsites
+          command: |
+            yum -y install tar gzip jq git          
+      - run:
           name: Run DB migrations
           command: |
             cd backend

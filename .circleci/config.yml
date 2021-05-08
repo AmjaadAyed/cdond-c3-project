@@ -208,60 +208,82 @@ jobs:
       # Here's where you will add some code to rollback on failure      
 
 
-
   run-migrations:
     docker:
-      - image: circleci/node:latest
+      - image: cimg/node:13.14.0
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
-          paths:
-            - project/
-      - run:
-          name: awscli install
-          command: |
-            sudo apt-get -y -qq update
-            sudo apt-get -y -qq install python3
-            sudo apt-get -qq install awscli
-            pwd
-            ls -la
-      - run:
-          name: add values to .env files
-          command: |
-            echo PWD
-            pwd
-            #ls -la
-            touch backend/.env
-            echo ENVIRONMENT=production >> "backend/.env"
-            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-            
+      - aws-cli/install
       - run:
           name: Run migrations
           command: |
-            cd backend 
-            npm install
-            npm run build
-            pwd
-            echo " THIS IS .env CONTENTS:"
-            cat .env
-            echo 'DUMP MIGRATIONS'
-            echo 'hello world!!' > migrations_dump.txt
-            npm run migrations >> migrations_dump.txt
-            echo "I AM HERE!!" 
-            pwd
-            ls -la
-            echo 'DISPLAY CONTENTS'
-            echo '*****************'
-            cat migrations_dump.txt
+            cd backend
+            npm i
+            npm run migrations > /tmp/npm_migration.log
+      - run:
+          name: Send migration results to memstash
+          command: |
+            if [[ `grep "has been executed successfully" /tmp/npm_migration.log | wc -l` -gt 0 ]] ; then
+              curl -H "Content-Type: text/plain" \
+                -H "token: ${MEMSTASH_TOKEN}" \
+                --request PUT \
+                --data "1" https://api.memstash.io/values/npm_migration_${CIRCLE_WORKFLOW_ID:0:7}
+              echo "Migration Complete"
+
+              
+  # run-migrations:
+  #   docker:
+  #     - image: circleci/node:latest
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: ~/
+  #         paths:
+  #           - project/
+  #     - run:
+  #         name: awscli install
+  #         command: |
+  #           sudo apt-get -y -qq update
+  #           sudo apt-get -y -qq install python3
+  #           sudo apt-get -qq install awscli
+  #           pwd
+  #           ls -la
+  #     - run:
+  #         name: add values to .env files
+  #         command: |
+  #           echo PWD
+  #           pwd
+  #           #ls -la
+  #           touch backend/.env
+  #           echo ENVIRONMENT=production >> "backend/.env"
+  #           echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+  #           echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+  #           echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
+  #           echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+  #           echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+  #           echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
+  #           echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+  #           echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
+  #           echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            
+  #     - run:
+  #         name: Run migrations
+  #         command: |
+  #           cd backend 
+  #           npm install
+  #           npm run build
+  #           pwd
+  #           echo " THIS IS .env CONTENTS:"
+  #           cat .env
+  #           echo 'DUMP MIGRATIONS'
+  #           echo 'hello world!!' > migrations_dump.txt
+  #           npm run migrations >> migrations_dump.txt
+  #           echo "I AM HERE!!" 
+  #           pwd
+  #           ls -la
+  #           echo 'DISPLAY CONTENTS'
+  #           echo '*****************'
+  #           cat migrations_dump.txt
 
 
 

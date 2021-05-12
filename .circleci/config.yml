@@ -156,7 +156,27 @@ jobs:
               -H "token: e38aee29-a976-4696-843d-2d115c52219a" \
               --request PUT \
               --data "$BACKEND_IP" https://api.memstash.io/values/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7}
-      
+       - run:
+          name: Add .env vars to backend distro
+          command: |
+            echo ENVIRONMENT=development > backend/.env
+            echo TYPEORM_CONNECTION=postgres >> backend/.env
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> backend/.env
+            echo TYPEORM_HOST=$TYPEORM_HOST >> backend/.env
+            echo TYPEORM_PORT=$TYPEORM_PORT >> backend/.env
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/.env
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo NODE_ENV=development >> "backend/.env"
+      - restore_cache:
+          keys: [backend-build]
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - .circleci/ansible/inventory.txt
+            - backend/     
 
 
 
@@ -183,49 +203,63 @@ jobs:
       - run:
           name: Configure server
           command: |
-            cd ~/project/.circleci/ansible
-            ansible-playbook configure-server.yml --inventory-file=inventory.txt
+            cd .circleci/ansible
+            echo "Inventory content"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure      
 
 
-  run-migrations:
+   run-migrations: 
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - attach_workspace:
-          at: .
-      - run:
-          name: install AWS CLI
-          working_directory: /tmp
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+          at: ~/project
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Run migrations
+          no_output_timeout: 7m
           command: |
             pwd
-            echo ENVIRONMENT=production > "backend/.env"
-            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            echo NODE_ENV=production >> "backend/.env"
-            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            ls
+            #cd backend && npm run migrations | tee migrations-${CIRCLE_WORKFLOW_ID}.txt
             cd backend
-            sudo npm install
-            # npm audit fix --audit-level=critical --force
-            # sudo npm run build
-            sudo npm run migrations > migration.log
-            cat migration.log
-            migration_status=$(cat migration.log | grep -c "No migrations are pending")
-            if [ $migration_status > 0 ]; then exit 0; else exit 1; fi;
+            cat .env
+            npm run migrations | tee migrations-${CIRCLE_WORKFLOW_ID}.txt
+            cat migrations-${CIRCLE_WORKFLOW_ID}.txt
+
+  # run-migrations:
+  #   docker:
+  #     - image: cimg/node:13.14.0
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: awscli install
+  #         command: |
+  #           sudo apt-get -y -qq update
+  #           sudo apt-get -y -qq install python3
+  #           sudo apt-get -qq install awscli
+  #           pwd
+  #           ls -la
+  #     - run:
+  #         name: Run migrations
+  #         command: |
+  #           cd backend
+  #           npm i
+  #           npm run migrations > /tmp/npm_migration.log
+  #     - run:
+  #         name: Send migration results to memstash
+  #         command: |
+  #           if [[ `grep "has been executed successfully" /tmp/npm_migration.log | wc -l` -gt 0 ]] ; then
+  #             curl -H "Content-Type: text/plain" \
+  #               -H "token: ${MEMSTASH_TOKEN}" \
+  #               --request PUT \
+  #               --data "1" https://api.memstash.io/values/npm_migration_${CIRCLE_WORKFLOW_ID:0:7}
+  #             echo "Migration Complete"
+
               
   # run-migrations:
   #   docker:

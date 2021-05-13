@@ -220,10 +220,13 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
+          name: install npm
+          command: |
+            npm install          
+      - run:
           name: Run migrations
           no_output_timeout: 7m
           command: |
-            npm install
             pwd
             ls
             #cd backend && npm run migrations | tee migrations-${CIRCLE_WORKFLOW_ID}.txt

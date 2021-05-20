@@ -222,13 +222,13 @@ jobs:
       - run:
           name: install npm
           command: |
-            cd frontend
+            cd backend
             npm install          
       - run:
           name: Run migrations
           no_output_timeout: 7m
           command: |
-            cd frontend
+            cd backend
             npm i
             npm run migrations > /temp/migration.log
 

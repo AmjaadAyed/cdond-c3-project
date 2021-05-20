@@ -222,15 +222,16 @@ jobs:
       - run:
           name: install npm
           command: |
+            cd backend
             npm install          
       - run:
           name: Run migrations
           no_output_timeout: 7m
           command: |
             pwd
-            ls
-            #cd backend && npm run migrations | tee migrations-${CIRCLE_WORKFLOW_ID}.txt
-            cd backend
+            ls #test
+            cd backend && npm run migrations | tee migrations-${CIRCLE_WORKFLOW_ID}.txt
+            #cd backend
             cat .env
             npm run migrations | tee migrations-${CIRCLE_WORKFLOW_ID}.txt
             cat migrations-${CIRCLE_WORKFLOW_ID}.txt

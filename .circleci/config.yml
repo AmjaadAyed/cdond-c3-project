@@ -229,10 +229,9 @@ jobs:
           no_output_timeout: 7m
           command: |
             cd backend
-            npm install
-            npm fund
-            npm audit fix
-            npm run migrations -- migration:run > migration_output.txt
+            npm cache clean --force
+            npm install            
+            npm run migrations  > migration_output.txt
   # run-migrations:
   #   docker:
   #     - image: cimg/node:13.14.0

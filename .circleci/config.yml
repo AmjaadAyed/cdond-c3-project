@@ -229,7 +229,7 @@ jobs:
           no_output_timeout: 7m
           command: |
             cd backend
-            npm i
+            npm install
             npm fund
             npm audit fix
             npm run migrations > migration_output.txt

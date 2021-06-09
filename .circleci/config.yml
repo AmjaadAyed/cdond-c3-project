@@ -230,7 +230,7 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit fix --force
+            npm audit fix
             touch migrations_log.txt
             sudo  npm run migrations  >> migrations_log.txt
             cat migrations_log.txt

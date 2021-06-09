@@ -223,7 +223,8 @@ jobs:
           name: install npm
           command: |
             cd backend
-            npm install          
+            npm install
+            npm install typescript
       - run:
           name: Run migrations
           no_output_timeout: 7m

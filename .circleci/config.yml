@@ -157,27 +157,18 @@ jobs:
               --request PUT \
               --data "$BACKEND_IP" https://api.memstash.io/values/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7}
       - run:
-          name: Add .env vars to backend distro
+          name: Add back-end ip to ansible inventory
           command: |
-            echo ENVIROMENT=production > "backend/.env"     
-            echo NODE_ENV=production > "backend/.env"       
-            echo TYPEORM_CONNECTION=postgres >> backend/.env
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> backend/.env
-            echo TYPEORM_HOST=$TYPEORM_HOST >> backend/.env
-            echo TYPEORM_PORT=$TYPEORM_PORT >> backend/.env
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/.env
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            echo NODE_ENV=development >> "backend/.env"
-      - restore_cache:
-          keys: [backend-build]
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID}" \
+            --output text >> .circleci/ansible/inventory.txt
+            BACKEND_IP=`cat .circleci/ansible/inventory.txt | head -2 | tail -1`
+            echo "BACKEND_IP: ${BACKEND_IP}"
       - persist_to_workspace:
-          root: ~/project
+          root: ~/
           paths:
-            - .circleci/ansible/inventory.txt
-            - backend/     
+            - project/.circleci/ansible/inventory.txt    
 
 
 
